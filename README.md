@@ -1,2 +1,2 @@
 # httpclient
-Java HttpClient
+Java com.javaquery.http.HttpClient
