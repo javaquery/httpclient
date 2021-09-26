@@ -1,6 +1,8 @@
 package com.javaquery.http;
 
 import com.javaquery.http.handler.HttpRequestHandler;
+import com.javaquery.http.handler.HttpResponseHandler;
+import com.javaquery.util.io.Console;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,9 +23,18 @@ public class HttpGetRequestTest {
         HttpExecutionContext httpExecutionContext = new HttpExecutionContext();
 
         HttpClient httpClient = new HttpClient();
-        httpClient.execute(httpExecutionContext, httpRequest, httpResponse -> {
-            Assertions.assertNotNull(httpResponse.getBody());
-            return null;
+
+        httpClient.execute(httpExecutionContext, httpRequest, new HttpResponseHandler<Object>() {
+            @Override
+            public Object onResponse(HttpResponse httpResponse) {
+                Assertions.assertNotNull(httpResponse.getBody());
+                return null;
+            }
+
+            @Override
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {
+
+            }
         });
     }
 
@@ -40,18 +51,51 @@ public class HttpGetRequestTest {
         httpExecutionContext.addHttpRequestHandler(headerHttpRequestHandler());
 
         HttpClient httpClient = new HttpClient();
-        httpClient.execute(httpExecutionContext, httpRequest, httpResponse -> {
-            Assertions.assertEquals(200, httpResponse.getStatusCode());
+        httpClient.execute(httpExecutionContext, httpRequest, new HttpResponseHandler<Object>() {
+            @Override
+            public Object onResponse(HttpResponse httpResponse) {
+                Assertions.assertEquals(200, httpResponse.getStatusCode());
 
-            JSONObject jsonObject = httpResponse.getJSONObjectBody();
-            Assertions.assertNotNull(jsonObject);
+                JSONObject jsonObject = httpResponse.getJSONObjectBody();
+                Assertions.assertNotNull(jsonObject);
 
-            JSONObject headers = jsonObject.optJSONObject("headers");
-            Assertions.assertEquals("faca52e4-1e15-11ec-9621-0242ac130002", headers.optString("Request-Id"));
+                JSONObject headers = jsonObject.optJSONObject("headers");
+                Assertions.assertEquals("faca52e4-1e15-11ec-9621-0242ac130002", headers.optString("Request-Id"));
 
-            JSONObject args = jsonObject.optJSONObject("args");
-            Assertions.assertEquals("javaquery", args.optString("utm_source"));
-            return null;
+                JSONObject args = jsonObject.optJSONObject("args");
+                Assertions.assertEquals("javaquery", args.optString("utm_source"));
+                return null;
+            }
+
+            @Override
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {
+
+            }
+        });
+    }
+
+    @Test
+    public void performRetryGetRequest(){
+        HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("GetRequest", HttpMethod.GET)
+                .withHost("https://httpbin.org")
+                .withEndPoint("/status/500")
+                .withRetryPolicy(DefaultRetryPolicy.get())
+                .build();
+
+        HttpExecutionContext httpExecutionContext = new HttpExecutionContext();
+
+        HttpClient httpClient = new HttpClient();
+        httpClient.execute(httpExecutionContext, httpRequest, new HttpResponseHandler<Object>() {
+            @Override
+            public Object onResponse(HttpResponse httpResponse) {
+                Assertions.assertEquals(500, httpResponse.getStatusCode());
+                return null;
+            }
+
+            @Override
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {
+                Assertions.assertEquals(500, httpResponse.getStatusCode());
+            }
         });
     }
 

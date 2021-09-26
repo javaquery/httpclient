@@ -3,7 +3,11 @@ package com.javaquery.http;
 import com.javaquery.http.exception.HttpException;
 import com.javaquery.util.Objects;
 import com.javaquery.util.collection.Collections;
+import com.javaquery.util.string.Strings;
 import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -12,6 +16,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.UnsupportedEncodingException;
@@ -63,6 +68,17 @@ class ApacheHttpRequestBuilder {
             httpRequest.getHeaders().forEach((key, value) -> apacheHttpRequest.setHeader(key, value));
         }
         return apacheHttpRequest;
+    }
+
+    protected CredentialsProvider credentialsProvider(){
+        if(Strings.nonNullNonEmpty(httpRequest.getUsername())
+            || Strings.nonNullNonEmpty(httpRequest.getPassword())){
+            UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(httpRequest.getUsername(), httpRequest.getPassword());
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
+            return credentialsProvider;
+        }
+        return null;
     }
 
     private URI buildHttpRequestURI(){

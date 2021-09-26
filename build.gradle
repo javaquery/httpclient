@@ -4,6 +4,7 @@ plugins {
     id 'signing'
 }
 
+sourceCompatibility = 1.8
 group 'com.javaquery'
 version '1.0.0'
 

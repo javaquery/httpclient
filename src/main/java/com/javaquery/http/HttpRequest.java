@@ -1,11 +1,13 @@
 package com.javaquery.http;
 
 import com.javaquery.http.exception.HttpException;
+import com.javaquery.http.retry.RetryPolicy;
 import com.javaquery.util.collection.Collections;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -18,11 +20,14 @@ public class HttpRequest {
 
     private final String httpRequestName;
     private final HttpMethod httpMethod;
+    private final String username;
+    private final String password;
     private final URI host;
     private final String endPoint;
     private Map<String, String> headers;
     private Map<String, String> queryParameters;
     private final HttpPayload httpPayload;
+    private final RetryPolicy retryPolicy;
 
     /**
      * Instantiates a new Http request.
@@ -34,11 +39,14 @@ public class HttpRequest {
     protected HttpRequest(String httpRequestName, HttpMethod httpMethod, HttpRequestBuilder httpRequestBuilder) {
         this.httpRequestName = httpRequestName;
         this.httpMethod = httpMethod;
+        this.username = httpRequestBuilder.username;
+        this.password = httpRequestBuilder.password;
         this.host = httpRequestBuilder.host;
         this.endPoint = httpRequestBuilder.endPoint;
         this.headers = httpRequestBuilder.headers;
         this.queryParameters = httpRequestBuilder.queryParameters;
         this.httpPayload = httpRequestBuilder.httpPayload;
+        this.retryPolicy = httpRequestBuilder.retryPolicy;
     }
 
     /**
@@ -57,6 +65,14 @@ public class HttpRequest {
      */
     public HttpMethod getHttpMethod() {
         return httpMethod;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     /**
@@ -156,6 +172,10 @@ public class HttpRequest {
         return httpPayload;
     }
 
+    public RetryPolicy getRetryPolicy() {
+        return retryPolicy;
+    }
+
     /**
      * The type Http payload.
      */
@@ -236,11 +256,14 @@ public class HttpRequest {
     public static final class HttpRequestBuilder {
         private final String httpRequestName;
         private final HttpMethod httpMethod;
+        private String username;
+        private String password;
         private URI host;
         private String endPoint;
         private Map<String, String> headers;
         private Map<String, String> queryParameters;
         private HttpPayload httpPayload;
+        private RetryPolicy retryPolicy;
 
         /**
          * Instantiates a new Http request builder.
@@ -251,8 +274,14 @@ public class HttpRequest {
         public HttpRequestBuilder(String httpRequestName, HttpMethod httpMethod) {
             this.httpRequestName = httpRequestName;
             this.httpMethod = httpMethod;
-            this.queryParameters = new HashMap<>();
             this.headers = new HashMap<>();
+            this.queryParameters = new LinkedHashMap<>();
+        }
+
+        public HttpRequestBuilder withUsernamePassword(String username, String password){
+            this.username = username;
+            this.password = password;
+            return this;
         }
 
         /**
@@ -335,6 +364,11 @@ public class HttpRequest {
          */
         public HttpRequestBuilder withHttpPayload(HttpPayload httpPayload){
             this.httpPayload = httpPayload;
+            return this;
+        }
+
+        public HttpRequestBuilder withRetryPolicy(RetryPolicy retryPolicy){
+            this.retryPolicy = retryPolicy;
             return this;
         }
 

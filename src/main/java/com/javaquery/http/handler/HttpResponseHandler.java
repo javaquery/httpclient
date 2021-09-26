@@ -17,4 +17,10 @@ public interface HttpResponseHandler<R> {
      * @return the r
      */
     R onResponse(HttpResponse httpResponse);
+
+    /**
+     * On max retry attempted
+     * @param httpResponse the http response
+     */
+    void onMaxRetryAttempted(HttpResponse httpResponse);
 }

@@ -1,6 +1,8 @@
 package com.javaquery.http;
 
 import com.javaquery.util.Objects;
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -8,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The type Http response.
@@ -18,6 +23,7 @@ import java.io.IOException;
 public class HttpResponse {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpResponse.class);
     private int statusCode;
+    private Map<String, String> headers;
     private String body;
     private org.apache.http.HttpResponse apacheHttpResponse;
 
@@ -28,6 +34,13 @@ public class HttpResponse {
      */
     public HttpResponse(org.apache.http.HttpResponse httpResponse) {
         apacheHttpResponse = httpResponse;
+        if(Objects.nonNull(httpResponse.getAllHeaders())
+            && httpResponse.getAllHeaders().length > 0){
+            headers = new HashMap<>();
+            for (Header header: httpResponse.getAllHeaders()) {
+                headers.put(header.getName(), header.getValue());
+            }
+        }
     }
 
     /**
@@ -37,6 +50,10 @@ public class HttpResponse {
      */
     public void updateHttpResponse(org.apache.http.HttpResponse apacheHttpResponse) {
         this.apacheHttpResponse = apacheHttpResponse;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
     }
 
     /**

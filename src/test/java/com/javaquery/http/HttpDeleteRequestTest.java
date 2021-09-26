@@ -1,6 +1,7 @@
 package com.javaquery.http;
 
 import com.javaquery.http.handler.HttpRequestHandler;
+import com.javaquery.http.handler.HttpResponseHandler;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,18 +26,24 @@ public class HttpDeleteRequestTest {
         httpExecutionContext.addHttpRequestHandler(headerHttpRequestHandler());
 
         HttpClient httpClient = new HttpClient();
-        httpClient.execute(httpExecutionContext, httpRequest, httpResponse -> {
-            Assertions.assertEquals(200, httpResponse.getStatusCode());
+        httpClient.execute(httpExecutionContext, httpRequest, new HttpResponseHandler<Object>() {
+            @Override
+            public Object onResponse(HttpResponse httpResponse) {
+                Assertions.assertEquals(200, httpResponse.getStatusCode());
 
-            JSONObject jsonObject = httpResponse.getJSONObjectBody();
-            Assertions.assertNotNull(jsonObject);
+                JSONObject jsonObject = httpResponse.getJSONObjectBody();
+                Assertions.assertNotNull(jsonObject);
 
-            JSONObject headers = jsonObject.optJSONObject("headers");
-            Assertions.assertEquals("faca52e4-1e15-11ec-9621-0242ac130002", headers.optString("Request-Id"));
+                JSONObject headers = jsonObject.optJSONObject("headers");
+                Assertions.assertEquals("faca52e4-1e15-11ec-9621-0242ac130002", headers.optString("Request-Id"));
 
-            JSONObject args = jsonObject.optJSONObject("args");
-            Assertions.assertEquals("javaquery", args.optString("utm_source"));
-            return null;
+                JSONObject args = jsonObject.optJSONObject("args");
+                Assertions.assertEquals("javaquery", args.optString("utm_source"));
+                return null;
+            }
+
+            @Override
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {}
         });
     }
 

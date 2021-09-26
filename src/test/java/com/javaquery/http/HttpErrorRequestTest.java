@@ -2,7 +2,7 @@ package com.javaquery.http;
 
 import com.javaquery.http.exception.HttpException;
 import com.javaquery.http.handler.HttpRequestHandler;
-import org.json.JSONObject;
+import com.javaquery.http.handler.HttpResponseHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,16 @@ public class HttpErrorRequestTest {
         httpExecutionContext.addHttpRequestHandler(headerHttpRequestHandler());
 
         HttpClient httpClient = new HttpClient();
-        httpClient.execute(httpExecutionContext, httpRequest, httpResponse -> null);
+        httpClient.execute(httpExecutionContext, httpRequest, new HttpResponseHandler<Object>() {
+            @Override
+            public Object onResponse(HttpResponse httpResponse) {
+                return null;
+            }
+
+            @Override
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {
+            }
+        });
     }
 
     @Test()
