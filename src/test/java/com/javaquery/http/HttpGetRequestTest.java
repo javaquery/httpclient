@@ -2,7 +2,6 @@ package com.javaquery.http;
 
 import com.javaquery.http.handler.HttpRequestHandler;
 import com.javaquery.http.handler.HttpResponseHandler;
-import com.javaquery.util.io.Console;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Test;
  * @author javaquery
  * @since 1.0.0
  */
-
 public class HttpGetRequestTest {
 
     @Test
