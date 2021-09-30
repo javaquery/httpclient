@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * The type Http request.
+ * The build Http request using the class.
  *
  * @author javaquery
  * @since 1.0.0
@@ -67,10 +67,20 @@ public class HttpRequest {
         return httpMethod;
     }
 
+    /**
+     * Gets username.
+     *
+     * @return the username
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Gets password.
+     *
+     * @return the password
+     */
     public String getPassword() {
         return password;
     }
@@ -172,6 +182,11 @@ public class HttpRequest {
         return httpPayload;
     }
 
+    /**
+     * Gets retry policy.
+     *
+     * @return the retry policy
+     */
     public RetryPolicy getRetryPolicy() {
         return retryPolicy;
     }
@@ -278,6 +293,13 @@ public class HttpRequest {
             this.queryParameters = new LinkedHashMap<>();
         }
 
+        /**
+         * With username password http request builder.
+         *
+         * @param username the username
+         * @param password the password
+         * @return the http request builder
+         */
         public HttpRequestBuilder withUsernamePassword(String username, String password){
             this.username = username;
             this.password = password;
@@ -367,6 +389,12 @@ public class HttpRequest {
             return this;
         }
 
+        /**
+         * With retry policy http request builder.
+         *
+         * @param retryPolicy the retry policy
+         * @return the http request builder
+         */
         public HttpRequestBuilder withRetryPolicy(RetryPolicy retryPolicy){
             this.retryPolicy = retryPolicy;
             return this;

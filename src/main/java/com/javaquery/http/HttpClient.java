@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The type Http client.
+ * The Http client responsible for making http requests.
  *
  * @author javaquery
  * @since 1.0.0
@@ -31,9 +31,11 @@ public class HttpClient {
     /**
      * Execute.
      *
+     * @param <R>                  the type parameter
      * @param httpExecutionContext the http execution context
      * @param httpRequest          the http request
      * @param httpResponseHandler  the http response handler
+     * @return the r
      */
     public <R> R execute(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponseHandler<R> httpResponseHandler) {
         final Map<String, String> originalHeaders = new HashMap<>(httpRequest.getHeaders());
@@ -60,6 +62,13 @@ public class HttpClient {
         return responseHandlerResult;
     }
 
+    /**
+     * @param httpExecutionContext the http execution context
+     * @param httpRequestResponse the http request response
+     * @param httpResponseHandler the http response handler
+     * @param <R> result type
+     * @return result
+     */
     private <R> R doExecute(HttpExecutionContext httpExecutionContext, HttpRequestResponse httpRequestResponse, HttpResponseHandler<R> httpResponseHandler) {
         LoggableHttpRequest loggableHttpRequest = null;
         HttpRequest httpRequest = httpRequestResponse.getHttpRequest();
@@ -94,35 +103,69 @@ public class HttpClient {
         return null;
     }
 
+    /**
+     * process before request handler
+     * @param httpExecutionContext the http execution context
+     * @param httpRequest the http request
+     */
     private void beforeRequest(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest) {
         if (Collections.nonNullNonEmpty(httpExecutionContext.getHttpRequestHandlers())) {
             httpExecutionContext.getHttpRequestHandlers().forEach(httpRequestHandler -> httpRequestHandler.beforeRequest(httpExecutionContext, httpRequest));
         }
     }
 
+    /**
+     * process after response handler
+     * @param httpExecutionContext the http execution context
+     * @param httpRequest the http request
+     * @param httpResponse the http response
+     */
     private void afterResponse(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
         if (Collections.nonNullNonEmpty(httpExecutionContext.getHttpRequestHandlers())) {
             httpExecutionContext.getHttpRequestHandlers().forEach(httpRequestHandler -> httpRequestHandler.afterResponse(httpExecutionContext, httpRequest, httpResponse));
         }
     }
 
+    /**
+     * process error handler
+     * @param httpExecutionContext the http execution context
+     * @param httpRequest the http request
+     * @param exception the exception
+     */
     private void onError(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, Exception exception) {
         if (Collections.nonNullNonEmpty(httpExecutionContext.getHttpRequestHandlers())) {
             httpExecutionContext.getHttpRequestHandlers().forEach(httpRequestHandler -> httpRequestHandler.onError(httpExecutionContext, httpRequest, exception));
         }
     }
 
+    /**
+     * check when to execute response handler
+     * @param httpRequestResponse the http request response
+     * @return result true or false
+     */
     private boolean shouldExecuteHttpResponseHandler(HttpRequestResponse httpRequestResponse) {
         return Objects.isNull(httpRequestResponse.getHttpRequest().getRetryPolicy())
                 || !shouldRetry(httpRequestResponse.getHttpRequest().getRetryPolicy(), httpRequestResponse);
     }
 
+    /**
+     * check should we retry the request based on retry policy
+     * @param retryPolicy the retry policy
+     * @param httpRequestResponse the http request response
+     * @return result true or false
+     */
     private boolean shouldRetry(RetryPolicy retryPolicy, HttpRequestResponse httpRequestResponse) {
-        boolean shouldRetryAttempted = retryPolicy.retryTillSucceed() || retryPolicy.getMaxErrorRetry() > httpRequestResponse.getRetriesAttempted();
+        boolean shouldRetryAttempted = retryPolicy.isRetryTillSucceed() || retryPolicy.getMaxErrorRetry() > httpRequestResponse.getRetriesAttempted();
         boolean shouldRetryCustomCondition = retryPolicy.getRetryCondition().shouldRetry(httpRequestResponse, httpRequestResponse.getRetriesAttempted());
         return shouldRetryAttempted && shouldRetryCustomCondition;
     }
 
+    /**
+     * Sleep for given milliseconds between retries
+     * @param retryPolicy the retry policy
+     * @param httpRequestResponse the http request response
+     * @param retriesAttempted retries attempted
+     */
     private void sleepFor(RetryPolicy retryPolicy, HttpRequestResponse httpRequestResponse, int retriesAttempted) {
         long delay = retryPolicy.getBackOffStrategy().delayBeforeNextRetry(httpRequestResponse, retriesAttempted);
         delay = Math.min(delay, MAX_BACKOFF_IN_MILLISECONDS);

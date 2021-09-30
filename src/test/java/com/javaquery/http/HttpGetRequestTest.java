@@ -77,7 +77,7 @@ public class HttpGetRequestTest {
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("GetRequest", HttpMethod.GET)
                 .withHost("https://httpbin.org")
                 .withEndPoint("/status/500")
-                .withRetryPolicy(DefaultRetryPolicy.get())
+                .withRetryPolicy(DefaultRetryPolicy.get(5))
                 .build();
 
         HttpExecutionContext httpExecutionContext = new HttpExecutionContext();

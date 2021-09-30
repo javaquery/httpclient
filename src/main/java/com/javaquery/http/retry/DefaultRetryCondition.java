@@ -4,6 +4,9 @@ import com.javaquery.http.HttpRequestResponse;
 import com.javaquery.util.Objects;
 
 /**
+ * The default retry condition you can use for server outage error.
+ * Http status code 500 and 503 are supported for now.
+ *
  * @author javaquery
  * @since 1.0.0
  */

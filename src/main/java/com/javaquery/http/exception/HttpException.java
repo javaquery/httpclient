@@ -1,7 +1,7 @@
 package com.javaquery.http.exception;
 
 /**
- * The type Http exception.
+ * Custom Http exception for the library
  *
  * @author javaquery
  * @since 1.0.0

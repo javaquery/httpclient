@@ -2,7 +2,6 @@ package com.javaquery.http;
 
 import com.javaquery.util.Objects;
 import org.apache.http.Header;
-import org.apache.http.HeaderElement;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -10,12 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The type Http response.
+ * The Http response object.
  *
  * @author javaquery
  * @since 1.0.0
@@ -52,6 +50,11 @@ public class HttpResponse {
         this.apacheHttpResponse = apacheHttpResponse;
     }
 
+    /**
+     * Gets headers.
+     *
+     * @return the headers
+     */
     public Map<String, String> getHeaders() {
         return headers;
     }

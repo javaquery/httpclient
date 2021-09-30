@@ -5,7 +5,7 @@ import com.javaquery.http.HttpRequest;
 import com.javaquery.http.HttpResponse;
 
 /**
- * The interface Http request handler.
+ * Implement interface to intercept the http request.
  *
  * @author javaquery
  * @since 1.0.0
@@ -13,7 +13,7 @@ import com.javaquery.http.HttpResponse;
 public interface HttpRequestHandler {
 
     /**
-     * Before http request.
+     * Method will be called before http request.
      *
      * @param httpExecutionContext the http execution context
      * @param httpRequest          the http request
@@ -21,7 +21,7 @@ public interface HttpRequestHandler {
     void beforeRequest(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest);
 
     /**
-     * After http response.
+     * Method will be called after http response received.
      *
      * @param httpExecutionContext the http execution context
      * @param httpRequest          the http request
@@ -30,7 +30,7 @@ public interface HttpRequestHandler {
     void afterResponse(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse);
 
     /**
-     * On error.
+     * Method will be called when exception occurs while processing http request.
      *
      * @param httpExecutionContext the http execution context
      * @param httpRequest          the http request

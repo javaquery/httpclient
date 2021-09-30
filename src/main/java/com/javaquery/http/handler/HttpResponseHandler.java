@@ -3,7 +3,7 @@ package com.javaquery.http.handler;
 import com.javaquery.http.HttpResponse;
 
 /**
- * The interface Http response handler.
+ * Implement interface to process http response received.
  *
  * @param <R> the type parameter
  * @author javaquery
@@ -11,7 +11,7 @@ import com.javaquery.http.HttpResponse;
  */
 public interface HttpResponseHandler<R> {
     /**
-     * On response r.
+     * Method will be called when http response received for http request
      *
      * @param httpResponse the http response
      * @return the r
@@ -19,7 +19,8 @@ public interface HttpResponseHandler<R> {
     R onResponse(HttpResponse httpResponse);
 
     /**
-     * On max retry attempted
+     * Method will be called when maximum retries performed on request as per the {@link com.javaquery.http.retry.RetryPolicy}.
+     *
      * @param httpResponse the http response
      */
     void onMaxRetryAttempted(HttpResponse httpResponse);

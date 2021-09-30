@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The type Http execution context.
+ * The Http execution context to hold extra data/information for http request and response.
+ * Use this class to provide {@link HttpRequestHandler}.
  *
  * @author javaquery
  * @since 1.0.0

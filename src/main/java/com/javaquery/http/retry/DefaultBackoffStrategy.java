@@ -3,6 +3,9 @@ package com.javaquery.http.retry;
 import com.javaquery.http.HttpRequestResponse;
 
 /**
+ * The default backoff strategy you can use to delay request by 3, 6, 12, 48 seconds.
+ * Maximum 120 will be permitted.
+ *
  * @author javaquery
  * @since 1.0.0
  */

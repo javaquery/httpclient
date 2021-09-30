@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The type Apache http request builder.
+ * Class is responsible to wrap {@link HttpRequest} into apache http request.
  *
  * @author javaquery
  * @since 1.0.0
@@ -45,7 +45,7 @@ class ApacheHttpRequestBuilder {
     }
 
     /**
-     * Build http uri request.
+     * Build GET, POST, PUT and DELETE http request
      *
      * @return the http uri request
      */
@@ -70,6 +70,11 @@ class ApacheHttpRequestBuilder {
         return apacheHttpRequest;
     }
 
+    /**
+     * Credentials provider credentials provider.
+     *
+     * @return the credentials provider
+     */
     protected CredentialsProvider credentialsProvider(){
         if(Strings.nonNullNonEmpty(httpRequest.getUsername())
             || Strings.nonNullNonEmpty(httpRequest.getPassword())){
@@ -81,6 +86,10 @@ class ApacheHttpRequestBuilder {
         return null;
     }
 
+    /**
+     * Build http request complete URI with parameters
+     * @return the URI
+     */
     private URI buildHttpRequestURI(){
         try {
             URIBuilder uriBuilder = new URIBuilder(httpRequest.getHost());
@@ -94,6 +103,10 @@ class ApacheHttpRequestBuilder {
         }
     }
 
+    /**
+     * Build payload of http request
+     * @return the StringEntity
+     */
     private StringEntity buildStringEntity(){
         if(Objects.nonNull(httpRequest.getHttpPayload())){
             if(Objects.nonNull(httpRequest.getHttpPayload().getPayload())){
