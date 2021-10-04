@@ -2,7 +2,6 @@ package com.javaquery.http;
 
 import com.javaquery.http.handler.HttpRequestHandler;
 import com.javaquery.http.handler.HttpResponseHandler;
-import com.javaquery.util.io.Console;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

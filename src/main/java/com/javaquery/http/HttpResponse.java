@@ -1,7 +1,10 @@
 package com.javaquery.http;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.javaquery.util.Objects;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,11 +21,19 @@ import java.util.Map;
  * @author javaquery
  * @since 1.0.0
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class HttpResponse {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpResponse.class);
+
     private int statusCode;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, String> headers;
+
+    @JsonIgnore
     private String body;
+
+    @JsonIgnore
     private org.apache.http.HttpResponse apacheHttpResponse;
 
     /**
@@ -44,10 +55,10 @@ public class HttpResponse {
     /**
      * Update http response.
      *
-     * @param apacheHttpResponse the apache http response
+     * @param httpEntity the http entity
      */
-    public void updateHttpResponse(org.apache.http.HttpResponse apacheHttpResponse) {
-        this.apacheHttpResponse = apacheHttpResponse;
+    public void updateHttpResponse(HttpEntity httpEntity) {
+        this.apacheHttpResponse.setEntity(httpEntity);
     }
 
     /**
@@ -80,6 +91,7 @@ public class HttpResponse {
      *
      * @return the json object body
      */
+    @JsonIgnore
     public JSONObject getJSONObjectBody() {
         return new JSONObject(getBody());
     }
@@ -89,6 +101,7 @@ public class HttpResponse {
      *
      * @return the json array
      */
+    @JsonIgnore
     public JSONArray getJSONArrayBody(){
         return new JSONArray(getBody());
     }

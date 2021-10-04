@@ -118,7 +118,7 @@ class ApacheHttpRequestBuilder {
                 httpRequest.getHttpPayload().getForm().forEach((key, value) -> form.add(new BasicNameValuePair(key, value)));
 
                 try {
-                    return new UrlEncodedFormEntity(form, StringPool.UTF8);
+                    return new UrlEncodedFormEntity(form, httpRequest.getHttpPayload().getCharset());
                 } catch (UnsupportedEncodingException e) {
                     throw new HttpException(e);
                 }

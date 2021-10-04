@@ -1,7 +1,6 @@
 package com.javaquery.http;
 
 import com.javaquery.http.handler.HttpResponseHandler;
-import com.javaquery.http.logging.LoggableHttpRequest;
 import com.javaquery.http.retry.RetryPolicy;
 import com.javaquery.util.Objects;
 import com.javaquery.util.collection.Collections;
@@ -15,6 +14,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static net.logstash.logback.marker.Markers.appendEntries;
 
 /**
  * The Http client responsible for making http requests.
@@ -70,15 +71,12 @@ public class HttpClient {
      * @return result
      */
     private <R> R doExecute(HttpExecutionContext httpExecutionContext, HttpRequestResponse httpRequestResponse, HttpResponseHandler<R> httpResponseHandler) {
-        LoggableHttpRequest loggableHttpRequest = null;
         HttpRequest httpRequest = httpRequestResponse.getHttpRequest();
         try {
             beforeRequest(httpExecutionContext, httpRequest);
 
             ApacheHttpRequestBuilder apacheHttpRequestBuilder = new ApacheHttpRequestBuilder(httpRequest);
             HttpUriRequest apacheHttpRequest = apacheHttpRequestBuilder.build();
-
-            loggableHttpRequest = new LoggableHttpRequest(httpRequest);
 
             CloseableHttpClient closeableHttpClient = HttpClients.custom()
                     .setDefaultCredentialsProvider(apacheHttpRequestBuilder.credentialsProvider())
@@ -89,12 +87,10 @@ public class HttpClient {
             afterResponse(httpExecutionContext, httpRequest, httpResponse);
             httpRequestResponse.setHttpResponse(httpResponse);
         } catch (Exception exception) {
-            exception.printStackTrace();
             LOGGER.error(exception.getMessage(), exception);
             onError(httpExecutionContext, httpRequest, exception);
         } finally {
-            LOGGER.info(StringPool.LOG_ACTION, StringPool.LOG_HTTP_REQUEST);
-            LOGGER.info(StringPool.LOG_HTTP_REQUEST, loggableHttpRequest);
+            LOGGER.info(appendEntries(httpRequestResponse.getAttributes()), null);
         }
 
         if (Objects.nonNull(httpResponseHandler) && shouldExecuteHttpResponseHandler(httpRequestResponse)) {

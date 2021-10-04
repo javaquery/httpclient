@@ -1,5 +1,7 @@
 package com.javaquery.http;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.javaquery.http.exception.HttpException;
 import com.javaquery.http.retry.RetryPolicy;
 import com.javaquery.util.collection.Collections;
@@ -16,15 +18,21 @@ import java.util.Map;
  * @author javaquery
  * @since 1.0.0
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class HttpRequest {
 
     private final String httpRequestName;
     private final HttpMethod httpMethod;
     private final String username;
+    @JsonIgnore
     private final String password;
     private final URI host;
     private final String endPoint;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, String> headers;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, String> queryParameters;
     private final HttpPayload httpPayload;
     private final RetryPolicy retryPolicy;
@@ -134,7 +142,7 @@ public class HttpRequest {
      * @return the http request
      */
     public HttpRequest withHeaders(Map<String, String> headers){
-        this.headers = headers;
+        this.headers.putAll(headers);
         return this;
     }
 
@@ -146,9 +154,6 @@ public class HttpRequest {
      * @return the http request
      */
     public HttpRequest withQueryParameter(String key, String value){
-        if(Collections.nullOrEmpty(queryParameters)){
-            this.queryParameters = new HashMap<>();
-        }
         this.queryParameters.put(key, value);
         return this;
     }
@@ -160,7 +165,7 @@ public class HttpRequest {
      * @return the http request
      */
     public HttpRequest withQueryParameter(Map<String, String> queryParameters){
-        this.queryParameters = queryParameters;
+        this.queryParameters.putAll(queryParameters);
         return this;
     }
 
@@ -194,10 +199,12 @@ public class HttpRequest {
     /**
      * The type Http payload.
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class HttpPayload{
         private final String charset;
         private final String contentType;
         private final String payload;
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private final Map<String, String> form;
 
         /**
@@ -351,7 +358,7 @@ public class HttpRequest {
          * @return the http request builder
          */
         public HttpRequestBuilder withHeaders(Map<String, String> headers){
-            this.headers = headers;
+            this.headers.putAll(headers);
             return this;
         }
 
@@ -374,7 +381,7 @@ public class HttpRequest {
          * @return the http request builder
          */
         public HttpRequestBuilder withQueryParameter(Map<String, String> queryParameters){
-            this.queryParameters = queryParameters;
+            this.queryParameters.putAll(queryParameters);
             return this;
         }
 

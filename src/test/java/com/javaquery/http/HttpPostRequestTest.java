@@ -2,6 +2,7 @@ package com.javaquery.http;
 
 import com.javaquery.http.handler.HttpRequestHandler;
 import com.javaquery.http.handler.HttpResponseHandler;
+import org.apache.http.entity.StringEntity;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -119,6 +120,9 @@ public class HttpPostRequestTest {
                 JSONObject jsonObject = httpResponse.getJSONObjectBody();
                 Assertions.assertNotNull(jsonObject);
 
+                String github = jsonObject.optString("github");
+                Assertions.assertNotNull(github);
+
                 JSONObject headers = jsonObject.optJSONObject("headers");
                 Assertions.assertEquals("faca52e4-1e15-11ec-9621-0242ac130002", headers.optString("Request-Id"));
 
@@ -144,6 +148,11 @@ public class HttpPostRequestTest {
             @Override
             public void afterResponse(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest, HttpResponse httpResponse) {
                 Assertions.assertNotNull(httpResponse);
+                JSONObject jsonResponse = httpResponse.getJSONObjectBody();
+                jsonResponse.put("github", "https://github.com/javaquery/httpclient");
+
+                StringEntity updatedResponse = new StringEntity(jsonResponse.toString(), StringPool.UTF8);
+                httpResponse.updateHttpResponse(updatedResponse);
             }
 
             @Override

@@ -1,5 +1,9 @@
 package com.javaquery.http;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * Holds http request and response object.
  *
@@ -72,5 +76,21 @@ public class HttpRequestResponse {
      */
     public void setRetriesAttempted(int retriesAttempted) {
         this.retriesAttempted = retriesAttempted;
+    }
+
+    /**
+     * Gets attributes.
+     *
+     * @return the attributes
+     */
+    public Map<String, Object> getAttributes() {
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put(StringPool.LOG_ACTION, StringPool.LOG_HTTP_REQUEST);
+        attributes.put(StringPool.LOG_HTTP_REQUEST, httpRequest);
+        if(Objects.nonNull(httpResponse)){
+            attributes.put(StringPool.LOG_HTTP_RESPONSE, httpResponse);
+        }
+        attributes.put(StringPool.RETRIES_ATTEMPTED, retriesAttempted);
+        return attributes;
     }
 }

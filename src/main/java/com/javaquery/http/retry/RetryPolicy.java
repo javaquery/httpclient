@@ -1,5 +1,6 @@
 package com.javaquery.http.retry;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.javaquery.http.HttpRequestResponse;
 import com.javaquery.http.StringPool;
 
@@ -11,8 +12,10 @@ import com.javaquery.http.StringPool;
  */
 public final class RetryPolicy {
 
+    @JsonIgnore
     private final RetryCondition retryCondition;
 
+    @JsonIgnore
     private final BackoffStrategy backOffStrategy;
 
     private final int maxErrorRetry;

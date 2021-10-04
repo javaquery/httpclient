@@ -6,6 +6,9 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author javaquery
  * @since 1.0.0
@@ -41,7 +44,10 @@ public class HttpGetRequestTest {
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("GetRequest", HttpMethod.GET)
                 .withHost("https://httpbin.org")
                 .withEndPoint("/get")
+                .withHeader("echo", "echo")
+                .withHeaders(dummyHeaderParameters())
                 .withQueryParameter("utm_source", "javaquery")
+                .withQueryParameter(dummyHeaderParameters())
                 .build();
 
         HttpExecutionContext httpExecutionContext = new HttpExecutionContext();
@@ -53,15 +59,20 @@ public class HttpGetRequestTest {
             @Override
             public Object onResponse(HttpResponse httpResponse) {
                 Assertions.assertEquals(200, httpResponse.getStatusCode());
+                Assertions.assertNotNull(httpResponse.getHeaders());
 
                 JSONObject jsonObject = httpResponse.getJSONObjectBody();
                 Assertions.assertNotNull(jsonObject);
 
                 JSONObject headers = jsonObject.optJSONObject("headers");
                 Assertions.assertEquals("faca52e4-1e15-11ec-9621-0242ac130002", headers.optString("Request-Id"));
+                Assertions.assertEquals("echo", headers.optString("Echo"));
+                Assertions.assertEquals("dummy", headers.optString("Dummy"));
 
                 JSONObject args = jsonObject.optJSONObject("args");
                 Assertions.assertEquals("javaquery", args.optString("utm_source"));
+                Assertions.assertEquals("dummy", args.optString("dummy"));
+                Assertions.assertEquals("Request-Param", args.optString("Request-Param"));
                 return null;
             }
 
@@ -102,6 +113,7 @@ public class HttpGetRequestTest {
             @Override
             public void beforeRequest(HttpExecutionContext httpExecutionContext, HttpRequest httpRequest) {
                 httpRequest.withHeader("Request-Id", "faca52e4-1e15-11ec-9621-0242ac130002");
+                httpRequest.withQueryParameter("Request-Param", "Request-Param");
             }
 
             @Override
@@ -117,5 +129,11 @@ public class HttpGetRequestTest {
 
             }
         };
+    }
+
+    public Map<String, String> dummyHeaderParameters(){
+        Map<String, String> map = new HashMap<>();
+        map.put("dummy", "dummy");
+        return map;
     }
 }

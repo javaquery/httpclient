@@ -9,5 +9,12 @@ public class StringPool {
     public static final String CONTENT_TYPE = "content-type";
     public static final String LOG_ACTION = "action";
     public static final String LOG_HTTP_REQUEST = "httpRequest";
+    public static final String LOG_HTTP_RESPONSE = "httpResponse";
     public static final String ERROR_MAX_RETRY_VALUE = "Please provide positive value for maxErrorRetry.";
+    public static final String HOST = "host";
+    public static final String HTTP_REQUEST_NAME = "httpRequestName";
+    public static final String HTTP_METHOD = "httpMethod";
+    public static final String END_POINT = "endPoint";
+    public static final String HEADERS = "headers";
+    public static final String RETRIES_ATTEMPTED = "retriesAttempted";
 }
