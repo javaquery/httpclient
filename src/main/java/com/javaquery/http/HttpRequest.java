@@ -198,6 +198,8 @@ public class HttpRequest {
 
     /**
      * The type Http payload.
+     * Use HttpPayload(String charset, String contentType, String payload) for String based payload.
+     * Use HttpPayload(String charset, String contentType, Map&lt;String, Object&gt; form) for form based payload.
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class HttpPayload{
@@ -205,7 +207,7 @@ public class HttpRequest {
         private final String contentType;
         private final String payload;
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
-        private final Map<String, String> form;
+        private final Map<String, Object> form;
 
         /**
          * Instantiates a new Http payload.
@@ -228,7 +230,7 @@ public class HttpRequest {
          * @param contentType the content type
          * @param form        the form
          */
-        public HttpPayload(String charset, String contentType, Map<String, String> form){
+        public HttpPayload(String charset, String contentType, Map<String, Object> form){
             this.charset = charset;
             this.contentType = contentType;
             this.form = form;
@@ -267,7 +269,7 @@ public class HttpRequest {
          *
          * @return the form
          */
-        public Map<String, String> getForm() {
+        public Map<String, Object> getForm() {
             return form;
         }
     }

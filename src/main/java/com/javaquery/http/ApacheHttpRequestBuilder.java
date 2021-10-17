@@ -4,6 +4,7 @@ import com.javaquery.http.exception.HttpException;
 import com.javaquery.util.Objects;
 import com.javaquery.util.collection.Collections;
 import com.javaquery.util.string.Strings;
+import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -15,10 +16,16 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.AbstractContentBody;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.message.BasicNameValuePair;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -49,22 +56,22 @@ class ApacheHttpRequestBuilder {
      *
      * @return the http uri request
      */
-    public HttpUriRequest build(){
-        if(httpRequest.getHttpMethod() == HttpMethod.GET){
+    public HttpUriRequest build() {
+        if (httpRequest.getHttpMethod() == HttpMethod.GET) {
             apacheHttpRequest = new HttpGet(buildHttpRequestURI());
-        }else if(httpRequest.getHttpMethod() == HttpMethod.POST){
+        } else if (httpRequest.getHttpMethod() == HttpMethod.POST) {
             HttpPost httpPost = new HttpPost(buildHttpRequestURI());
-            httpPost.setEntity(buildStringEntity());
+            httpPost.setEntity(buildHttpEntity());
             apacheHttpRequest = httpPost;
-        }else if(httpRequest.getHttpMethod() == HttpMethod.PUT){
+        } else if (httpRequest.getHttpMethod() == HttpMethod.PUT) {
             HttpPut httpPut = new HttpPut(buildHttpRequestURI());
-            httpPut.setEntity(buildStringEntity());
+            httpPut.setEntity(buildHttpEntity());
             apacheHttpRequest = httpPut;
-        }else if(httpRequest.getHttpMethod() == HttpMethod.DELETE){
+        } else if (httpRequest.getHttpMethod() == HttpMethod.DELETE) {
             apacheHttpRequest = new HttpDelete(buildHttpRequestURI());
         }
 
-        if(Collections.nonNullNonEmpty(httpRequest.getHeaders())){
+        if (Collections.nonNullNonEmpty(httpRequest.getHeaders())) {
             httpRequest.getHeaders().forEach((key, value) -> apacheHttpRequest.setHeader(key, value));
         }
         return apacheHttpRequest;
@@ -75,9 +82,9 @@ class ApacheHttpRequestBuilder {
      *
      * @return the credentials provider
      */
-    protected CredentialsProvider credentialsProvider(){
-        if(Strings.nonNullNonEmpty(httpRequest.getUsername())
-            || Strings.nonNullNonEmpty(httpRequest.getPassword())){
+    protected CredentialsProvider credentialsProvider() {
+        if (Strings.nonNullNonEmpty(httpRequest.getUsername())
+                || Strings.nonNullNonEmpty(httpRequest.getPassword())) {
             UsernamePasswordCredentials usernamePasswordCredentials = new UsernamePasswordCredentials(httpRequest.getUsername(), httpRequest.getPassword());
             CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
             credentialsProvider.setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), usernamePasswordCredentials);
@@ -88,13 +95,14 @@ class ApacheHttpRequestBuilder {
 
     /**
      * Build http request complete URI with parameters
+     *
      * @return the URI
      */
-    private URI buildHttpRequestURI(){
+    private URI buildHttpRequestURI() {
         try {
             URIBuilder uriBuilder = new URIBuilder(httpRequest.getHost());
             uriBuilder.setPath(httpRequest.getEndPoint());
-            if(Collections.nonNullNonEmpty(httpRequest.getQueryParameters())){
+            if (Collections.nonNullNonEmpty(httpRequest.getQueryParameters())) {
                 httpRequest.getQueryParameters().forEach(uriBuilder::addParameter);
             }
             return uriBuilder.build();
@@ -105,25 +113,50 @@ class ApacheHttpRequestBuilder {
 
     /**
      * Build payload of http request
-     * @return the StringEntity
+     *
+     * @return the HttpEntity
      */
-    private StringEntity buildStringEntity(){
-        if(Objects.nonNull(httpRequest.getHttpPayload())){
-            if(Objects.nonNull(httpRequest.getHttpPayload().getPayload())){
+    private HttpEntity buildHttpEntity() {
+        if (Objects.nonNull(httpRequest.getHttpPayload())) {
+            if (Objects.nonNull(httpRequest.getHttpPayload().getPayload())) {
                 StringEntity stringEntity = new StringEntity(httpRequest.getHttpPayload().getPayload(), httpRequest.getHttpPayload().getCharset());
                 httpRequest.withHeader(StringPool.CONTENT_TYPE, httpRequest.getHttpPayload().getContentType());
                 return stringEntity;
-            }else if(Collections.nonNullNonEmpty(httpRequest.getHttpPayload().getForm())){
-                List<NameValuePair> form = new ArrayList<>();
-                httpRequest.getHttpPayload().getForm().forEach((key, value) -> form.add(new BasicNameValuePair(key, value)));
+            } else if (Collections.nonNullNonEmpty(httpRequest.getHttpPayload().getForm())) {
+                if (StringPool.MULTIPART_FORM_DATA.equals(httpRequest.getHttpPayload().getContentType())
+                        || httpRequest.getHttpPayload().getContentType().contains(StringPool.MULTIPART_FORM_DATA)) {
+                    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 
-                try {
-                    return new UrlEncodedFormEntity(form, httpRequest.getHttpPayload().getCharset());
-                } catch (UnsupportedEncodingException e) {
-                    throw new HttpException(e);
+                    httpRequest.getHttpPayload().getForm().forEach((key, value) -> {
+                        if (value instanceof List) {
+                            List values = (List) value;
+                            for (Object o : values) {
+                                builder.addPart(key, addFormPart(o));
+                            }
+                        } else {
+                            builder.addPart(key, addFormPart(value));
+                        }
+                    });
+                    return builder.build();
+                } else {
+                    List<NameValuePair> form = new ArrayList<>();
+                    httpRequest.getHttpPayload().getForm().forEach((key, value) -> form.add(new BasicNameValuePair(key, (String) value)));
+                    try {
+                        return new UrlEncodedFormEntity(form, httpRequest.getHttpPayload().getCharset());
+                    } catch (UnsupportedEncodingException e) {
+                        throw new HttpException(e);
+                    }
                 }
             }
         }
         return null;
+    }
+
+    private AbstractContentBody addFormPart(Object value) {
+        if (value instanceof File) {
+            return new FileBody((File) value, ContentType.DEFAULT_BINARY);
+        } else {
+            return new StringBody((String) value, ContentType.MULTIPART_FORM_DATA);
+        }
     }
 }
