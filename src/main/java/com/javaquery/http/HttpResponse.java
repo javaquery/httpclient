@@ -3,6 +3,7 @@ package com.javaquery.http;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.javaquery.util.Objects;
+import com.javaquery.util.string.Strings;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
@@ -79,6 +80,9 @@ public class HttpResponse {
         if(Objects.nonNull(apacheHttpResponse)){
             try {
                 body = EntityUtils.toString(apacheHttpResponse.getEntity());
+                if(Strings.nonNullNonEmpty(body) && body.startsWith(StringPool.UTF8_BOM)){
+                    body = body.substring(1);
+                }
             } catch (IOException e) {
                 LOGGER.error(e.getMessage(), e);
             }
@@ -93,7 +97,11 @@ public class HttpResponse {
      */
     @JsonIgnore
     public JSONObject getJSONObjectBody() {
-        return new JSONObject(getBody());
+        String strResponse = getBody();
+        if(Strings.nonNullNonEmpty(strResponse)){
+            return new JSONObject(strResponse);
+        }
+        return null;
     }
 
     /**
@@ -103,7 +111,11 @@ public class HttpResponse {
      */
     @JsonIgnore
     public JSONArray getJSONArrayBody(){
-        return new JSONArray(getBody());
+        String strResponse = getBody();
+        if(Strings.nonNullNonEmpty(strResponse)){
+            return new JSONArray(strResponse);
+        }
+        return null;
     }
 
     /**

@@ -50,8 +50,12 @@ public class HttpGetRequestTest {
                 .withQueryParameter(dummyHeaderParameters())
                 .build();
 
+        Map<String, Object> metaData = new HashMap<>(1);
+        metaData.put("this", "that");
         HttpExecutionContext httpExecutionContext = new HttpExecutionContext();
+        httpExecutionContext.setMetaData(metaData);
         httpExecutionContext.addMetaData("meta", "data");
+
         httpExecutionContext.addHttpRequestHandler(headerHttpRequestHandler());
 
         HttpClient httpClient = new HttpClient();
@@ -108,6 +112,41 @@ public class HttpGetRequestTest {
         });
     }
 
+    @Test
+    public void performGetRedirect(){
+        HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("GetRequest", HttpMethod.GET)
+                .withHost("https://httpbingo.org/")
+                .withEndPoint("/redirect-to")
+                .withQueryParameter("url", "https://httpbin.org/get?dummy=dummy")
+                .build();
+
+        HttpExecutionContext httpExecutionContext = new HttpExecutionContext();
+
+        HttpClient httpClient = new HttpClient();
+        httpClient.execute(httpExecutionContext, httpRequest, new HttpResponseHandler<Object>() {
+            @Override
+            public Object onResponse(HttpResponse httpResponse) {
+                Assertions.assertEquals(200, httpResponse.getStatusCode());
+
+                JSONObject jsonObject = httpResponse.getJSONObjectBody();
+                Assertions.assertNotNull(jsonObject);
+
+                JSONObject headers = jsonObject.optJSONObject("headers");
+                Assertions.assertEquals("httpbin.org", headers.optString("Host"));
+
+                JSONObject args = jsonObject.optJSONObject("args");
+                Assertions.assertEquals("dummy", args.optString("dummy"));
+
+                return null;
+            }
+
+            @Override
+            public void onMaxRetryAttempted(HttpResponse httpResponse) {
+                Assertions.assertEquals(500, httpResponse.getStatusCode());
+            }
+        });
+    }
+
     private HttpRequestHandler headerHttpRequestHandler(){
         return new HttpRequestHandler() {
             @Override
@@ -121,6 +160,7 @@ public class HttpGetRequestTest {
                 Assertions.assertNotNull(httpResponse);
                 Assertions.assertNotNull(httpExecutionContext.getMetaData());
                 Assertions.assertEquals("data", httpExecutionContext.getMeta("meta", null));
+                Assertions.assertEquals("that", httpExecutionContext.getMeta("this", null));
                 Assertions.assertEquals("defaultValue", httpExecutionContext.getMeta("no-key", "defaultValue"));
             }
 
