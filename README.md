@@ -1,6 +1,7 @@
 # JavaQuery HttpClient
 
 Welcome to the JavaQuery http client
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.javaquery/httpclient/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.javaquery/httpclient)
 
 # Why http client?
 

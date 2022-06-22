@@ -6,21 +6,21 @@ plugins {
 
 sourceCompatibility = 1.8
 group 'com.javaquery'
-version '1.0.0'
+version '1.0.1'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'org.slf4j:slf4j-api:+'
-    implementation 'org.json:json:+'
-    implementation 'com.javaquery:util:+'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha7'
+    implementation 'org.json:json:20220320'
+    implementation 'com.javaquery:util:1.2.1'
 
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
     implementation 'org.apache.httpcomponents:httpmime:4.5.13'
 
-    implementation 'net.logstash.logback:logstash-logback-encoder:6.6'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
 
     testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '+'
     testImplementation('org.junit.jupiter:junit-jupiter:5.8.1')
@@ -93,7 +93,7 @@ publishing {
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
                 username "javaquery"
-                password "******"
+                password "a2a@\$ASDF#777"
             }
         }
     }
