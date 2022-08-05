@@ -82,7 +82,7 @@ public class HttpClient {
                     .setDefaultCredentialsProvider(apacheHttpRequestBuilder.credentialsProvider())
                     .build();
             org.apache.http.HttpResponse closeableHttpResponse = closeableHttpClient.execute(apacheHttpRequest);
-
+            httpRequestResponse.setExecutionEndTime();
             HttpResponse httpResponse = new HttpResponse(closeableHttpResponse);
             afterResponse(httpExecutionContext, httpRequest, httpResponse);
             httpRequestResponse.setHttpResponse(httpResponse);
