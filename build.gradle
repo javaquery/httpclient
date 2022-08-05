@@ -93,7 +93,7 @@ publishing {
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
                 username "javaquery"
-                password "a2a@\$ASDF#777"
+                password "********"
             }
         }
     }
