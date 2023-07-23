@@ -27,6 +27,7 @@ public class HttpRequest {
     @JsonIgnore
     private final String password;
     private final URI host;
+    private final int port;
     private final String endPoint;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -50,6 +51,7 @@ public class HttpRequest {
         this.username = httpRequestBuilder.username;
         this.password = httpRequestBuilder.password;
         this.host = httpRequestBuilder.host;
+        this.port = httpRequestBuilder.port;
         this.endPoint = httpRequestBuilder.endPoint;
         this.headers = httpRequestBuilder.headers;
         this.queryParameters = httpRequestBuilder.queryParameters;
@@ -100,6 +102,10 @@ public class HttpRequest {
      */
     public URI getHost() {
         return host;
+    }
+
+    public int getPort() {
+        return port;
     }
 
     /**
@@ -283,6 +289,7 @@ public class HttpRequest {
         private String username;
         private String password;
         private URI host;
+        private int port;
         private String endPoint;
         private Map<String, String> headers;
         private Map<String, String> queryParameters;
@@ -327,6 +334,11 @@ public class HttpRequest {
             } catch (URISyntaxException e) {
                 throw new HttpException(e);
             }
+            return this;
+        }
+
+        public HttpRequestBuilder withPort(int port){
+            this.port = port;
             return this;
         }
 

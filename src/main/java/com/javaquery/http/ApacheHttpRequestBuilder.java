@@ -10,11 +10,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -58,7 +54,14 @@ class ApacheHttpRequestBuilder {
      */
     public HttpUriRequest build() {
         if (httpRequest.getHttpMethod() == HttpMethod.GET) {
-            apacheHttpRequest = new HttpGet(buildHttpRequestURI());
+            if(Objects.nonNull(httpRequest.getHttpPayload())){
+                HttpGetWithEntity httpGetWithEntity = new HttpGetWithEntity();
+                httpGetWithEntity.setURI(buildHttpRequestURI());
+                httpGetWithEntity.setEntity(buildHttpEntity());
+                apacheHttpRequest = httpGetWithEntity;
+            }else{
+                apacheHttpRequest = new HttpGet(buildHttpRequestURI());
+            }
         } else if (httpRequest.getHttpMethod() == HttpMethod.POST) {
             HttpPost httpPost = new HttpPost(buildHttpRequestURI());
             httpPost.setEntity(buildHttpEntity());
@@ -101,6 +104,9 @@ class ApacheHttpRequestBuilder {
     private URI buildHttpRequestURI() {
         try {
             URIBuilder uriBuilder = new URIBuilder(httpRequest.getHost());
+            if(httpRequest.getPort() != 0){
+                uriBuilder.setPort(httpRequest.getPort());
+            }
             uriBuilder.setPath(httpRequest.getEndPoint());
             if (Collections.nonNullNonEmpty(httpRequest.getQueryParameters())) {
                 httpRequest.getQueryParameters().forEach(uriBuilder::addParameter);
@@ -157,6 +163,15 @@ class ApacheHttpRequestBuilder {
             return new FileBody((File) value, ContentType.DEFAULT_BINARY);
         } else {
             return new StringBody((String) value, ContentType.MULTIPART_FORM_DATA);
+        }
+    }
+
+    public class HttpGetWithEntity extends HttpEntityEnclosingRequestBase {
+        public final static String METHOD_NAME = "GET";
+
+        @Override
+        public String getMethod() {
+            return METHOD_NAME;
         }
     }
 }
