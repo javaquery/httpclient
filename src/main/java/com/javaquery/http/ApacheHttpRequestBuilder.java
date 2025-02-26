@@ -11,7 +11,6 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -23,8 +22,6 @@ import org.apache.http.message.BasicNameValuePair;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,22 +53,22 @@ class ApacheHttpRequestBuilder {
         if (httpRequest.getHttpMethod() == HttpMethod.GET) {
             if(Objects.nonNull(httpRequest.getHttpPayload())){
                 HttpGetWithEntity httpGetWithEntity = new HttpGetWithEntity();
-                httpGetWithEntity.setURI(buildHttpRequestURI());
+                httpGetWithEntity.setURI(httpRequest.httpRequestURI());
                 httpGetWithEntity.setEntity(buildHttpEntity());
                 apacheHttpRequest = httpGetWithEntity;
             }else{
-                apacheHttpRequest = new HttpGet(buildHttpRequestURI());
+                apacheHttpRequest = new HttpGet(httpRequest.httpRequestURI());
             }
         } else if (httpRequest.getHttpMethod() == HttpMethod.POST) {
-            HttpPost httpPost = new HttpPost(buildHttpRequestURI());
+            HttpPost httpPost = new HttpPost(httpRequest.httpRequestURI());
             httpPost.setEntity(buildHttpEntity());
             apacheHttpRequest = httpPost;
         } else if (httpRequest.getHttpMethod() == HttpMethod.PUT) {
-            HttpPut httpPut = new HttpPut(buildHttpRequestURI());
+            HttpPut httpPut = new HttpPut(httpRequest.httpRequestURI());
             httpPut.setEntity(buildHttpEntity());
             apacheHttpRequest = httpPut;
         } else if (httpRequest.getHttpMethod() == HttpMethod.DELETE) {
-            apacheHttpRequest = new HttpDelete(buildHttpRequestURI());
+            apacheHttpRequest = new HttpDelete(httpRequest.httpRequestURI());
         }
 
         if (Collections.nonNullNonEmpty(httpRequest.getHeaders())) {
@@ -94,27 +91,6 @@ class ApacheHttpRequestBuilder {
             return credentialsProvider;
         }
         return null;
-    }
-
-    /**
-     * Build http request complete URI with parameters
-     *
-     * @return the URI
-     */
-    private URI buildHttpRequestURI() {
-        try {
-            URIBuilder uriBuilder = new URIBuilder(httpRequest.getHost());
-            if(httpRequest.getPort() != 0){
-                uriBuilder.setPort(httpRequest.getPort());
-            }
-            uriBuilder.setPath(httpRequest.getEndPoint());
-            if (Collections.nonNullNonEmpty(httpRequest.getQueryParameters())) {
-                httpRequest.getQueryParameters().forEach(uriBuilder::addParameter);
-            }
-            return uriBuilder.build();
-        } catch (URISyntaxException e) {
-            throw new HttpException(e);
-        }
     }
 
     /**
@@ -166,7 +142,7 @@ class ApacheHttpRequestBuilder {
         }
     }
 
-    public class HttpGetWithEntity extends HttpEntityEnclosingRequestBase {
+    public static class HttpGetWithEntity extends HttpEntityEnclosingRequestBase {
         public final static String METHOD_NAME = "GET";
 
         @Override

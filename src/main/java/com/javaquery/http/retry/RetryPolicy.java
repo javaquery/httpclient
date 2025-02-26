@@ -3,6 +3,7 @@ package com.javaquery.http.retry;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.javaquery.http.HttpRequestResponse;
 import com.javaquery.http.StringPool;
+import lombok.Getter;
 
 /**
  * The type Retry policy.
@@ -10,6 +11,7 @@ import com.javaquery.http.StringPool;
  * @author javaquery
  * @since 1.0.0
  */
+@Getter
 public final class RetryPolicy {
 
     @JsonIgnore
@@ -36,33 +38,6 @@ public final class RetryPolicy {
         this.retryCondition = retryCondition;
         this.backOffStrategy = backOffStrategy;
         this.maxErrorRetry = maxErrorRetry;
-    }
-
-    /**
-     * Gets retry condition.
-     *
-     * @return the retry condition
-     */
-    public RetryCondition getRetryCondition() {
-        return retryCondition;
-    }
-
-    /**
-     * Gets back off strategy.
-     *
-     * @return the back off strategy
-     */
-    public BackoffStrategy getBackOffStrategy() {
-        return backOffStrategy;
-    }
-
-    /**
-     * Gets max error retry.
-     *
-     * @return the max error retry
-     */
-    public int getMaxErrorRetry() {
-        return maxErrorRetry;
     }
 
     /**

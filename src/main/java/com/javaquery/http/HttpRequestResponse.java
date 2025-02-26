@@ -1,5 +1,8 @@
 package com.javaquery.http;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -10,6 +13,8 @@ import java.util.Objects;
  * @author javaquery
  * @since 1.0.0
  */
+@Getter
+@Setter
 public class HttpRequestResponse {
     private HttpRequest httpRequest;
     private HttpResponse httpResponse;
@@ -25,60 +30,6 @@ public class HttpRequestResponse {
     public HttpRequestResponse(HttpRequest httpRequest){
         this.httpRequest = httpRequest;
         this.executionStartTime = System.currentTimeMillis();
-    }
-
-    /**
-     * Gets http request.
-     *
-     * @return the http request
-     */
-    public HttpRequest getHttpRequest() {
-        return httpRequest;
-    }
-
-    /**
-     * Sets http request.
-     *
-     * @param httpRequest the http request
-     */
-    public void setHttpRequest(HttpRequest httpRequest) {
-        this.httpRequest = httpRequest;
-    }
-
-    /**
-     * Gets http response.
-     *
-     * @return the http response
-     */
-    public HttpResponse getHttpResponse() {
-        return httpResponse;
-    }
-
-    /**
-     * Sets http response.
-     *
-     * @param httpResponse the http response
-     */
-    public void setHttpResponse(HttpResponse httpResponse) {
-        this.httpResponse = httpResponse;
-    }
-
-    /**
-     * Gets retries attempted.
-     *
-     * @return the retries attempted
-     */
-    public int getRetriesAttempted() {
-        return retriesAttempted;
-    }
-
-    /**
-     * Sets retries attempted.
-     *
-     * @param retriesAttempted the retries attempted
-     */
-    public void setRetriesAttempted(int retriesAttempted) {
-        this.retriesAttempted = retriesAttempted;
     }
 
     /**

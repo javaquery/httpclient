@@ -115,7 +115,7 @@ public class HttpGetRequestTest {
     @Test
     public void performGetRedirect(){
         HttpRequest httpRequest = new HttpRequest.HttpRequestBuilder("GetRequest", HttpMethod.GET)
-                .withHost("https://httpbingo.org")
+                .withHost("https://httpbin.org")
                 .withEndPoint("/redirect-to")
                 .withQueryParameter("url", "https://httpbin.org/get?dummy=dummy")
                 .build();
