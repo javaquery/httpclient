@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.javaquery.http.exception.HttpException;
 import com.javaquery.http.retry.RetryPolicy;
 import com.javaquery.util.collection.Collections;
+import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -133,8 +134,8 @@ public class HttpRequest {
      * @param value the value
      * @return the http request
      */
-    public HttpRequest withHeader(String key, String value){
-        if(Collections.nullOrEmpty(headers)){
+    public HttpRequest withHeader(String key, String value) {
+        if (Collections.nullOrEmpty(headers)) {
             headers = new HashMap<>();
         }
         this.headers.put(key, value);
@@ -147,7 +148,7 @@ public class HttpRequest {
      * @param headers the headers
      * @return the http request
      */
-    public HttpRequest withHeaders(Map<String, String> headers){
+    public HttpRequest withHeaders(Map<String, String> headers) {
         this.headers.putAll(headers);
         return this;
     }
@@ -159,7 +160,7 @@ public class HttpRequest {
      * @param value the value
      * @return the http request
      */
-    public HttpRequest withQueryParameter(String key, String value){
+    public HttpRequest withQueryParameter(String key, String value) {
         this.queryParameters.put(key, value);
         return this;
     }
@@ -170,7 +171,7 @@ public class HttpRequest {
      * @param queryParameters the query parameters
      * @return the http request
      */
-    public HttpRequest withQueryParameter(Map<String, String> queryParameters){
+    public HttpRequest withQueryParameter(Map<String, String> queryParameters) {
         this.queryParameters.putAll(queryParameters);
         return this;
     }
@@ -203,12 +204,33 @@ public class HttpRequest {
     }
 
     /**
+     * Build http request complete URI with parameters
+     *
+     * @return the URI
+     */
+    public URI httpRequestURI() {
+        try {
+            URIBuilder uriBuilder = new URIBuilder(getHost());
+            if (getPort() != 0) {
+                uriBuilder.setPort(getPort());
+            }
+            uriBuilder.setPath(getEndPoint());
+            if (Collections.nonNullNonEmpty(getQueryParameters())) {
+                getQueryParameters().forEach(uriBuilder::addParameter);
+            }
+            return uriBuilder.build();
+        } catch (URISyntaxException e) {
+            throw new HttpException(e);
+        }
+    }
+
+    /**
      * The type Http payload.
      * Use HttpPayload(String charset, String contentType, String payload) for String based payload.
      * Use HttpPayload(String charset, String contentType, Map&lt;String, Object&gt; form) for form based payload.
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class HttpPayload{
+    public static class HttpPayload {
         private final String charset;
         private final String contentType;
         private final String payload;
@@ -236,7 +258,7 @@ public class HttpRequest {
          * @param contentType the content type
          * @param form        the form
          */
-        public HttpPayload(String charset, String contentType, Map<String, Object> form){
+        public HttpPayload(String charset, String contentType, Map<String, Object> form) {
             this.charset = charset;
             this.contentType = contentType;
             this.form = form;
@@ -316,7 +338,7 @@ public class HttpRequest {
          * @param password the password
          * @return the http request builder
          */
-        public HttpRequestBuilder withUsernamePassword(String username, String password){
+        public HttpRequestBuilder withUsernamePassword(String username, String password) {
             this.username = username;
             this.password = password;
             return this;
@@ -328,7 +350,7 @@ public class HttpRequest {
          * @param host the host
          * @return the http request builder
          */
-        public HttpRequestBuilder withHost(String host){
+        public HttpRequestBuilder withHost(String host) {
             try {
                 this.host = new URI(host);
             } catch (URISyntaxException e) {
@@ -337,7 +359,7 @@ public class HttpRequest {
             return this;
         }
 
-        public HttpRequestBuilder withPort(int port){
+        public HttpRequestBuilder withPort(int port) {
             this.port = port;
             return this;
         }
@@ -348,7 +370,7 @@ public class HttpRequest {
          * @param endPoint the end point
          * @return the http request builder
          */
-        public HttpRequestBuilder withEndPoint(String endPoint){
+        public HttpRequestBuilder withEndPoint(String endPoint) {
             this.endPoint = endPoint;
             return this;
         }
@@ -360,7 +382,7 @@ public class HttpRequest {
          * @param value the value
          * @return the http request builder
          */
-        public HttpRequestBuilder withHeader(String key, String value){
+        public HttpRequestBuilder withHeader(String key, String value) {
             this.headers.put(key, value);
             return this;
         }
@@ -371,7 +393,7 @@ public class HttpRequest {
          * @param headers the headers
          * @return the http request builder
          */
-        public HttpRequestBuilder withHeaders(Map<String, String> headers){
+        public HttpRequestBuilder withHeaders(Map<String, String> headers) {
             this.headers.putAll(headers);
             return this;
         }
@@ -383,7 +405,7 @@ public class HttpRequest {
          * @param value the value
          * @return the http request builder
          */
-        public HttpRequestBuilder withQueryParameter(String key, String value){
+        public HttpRequestBuilder withQueryParameter(String key, String value) {
             this.queryParameters.put(key, value);
             return this;
         }
@@ -394,7 +416,7 @@ public class HttpRequest {
          * @param queryParameters the query parameters
          * @return the http request builder
          */
-        public HttpRequestBuilder withQueryParameter(Map<String, String> queryParameters){
+        public HttpRequestBuilder withQueryParameter(Map<String, String> queryParameters) {
             this.queryParameters.putAll(queryParameters);
             return this;
         }
@@ -405,7 +427,7 @@ public class HttpRequest {
          * @param httpPayload the http payload
          * @return the http request builder
          */
-        public HttpRequestBuilder withHttpPayload(HttpPayload httpPayload){
+        public HttpRequestBuilder withHttpPayload(HttpPayload httpPayload) {
             this.httpPayload = httpPayload;
             return this;
         }
@@ -416,7 +438,7 @@ public class HttpRequest {
          * @param retryPolicy the retry policy
          * @return the http request builder
          */
-        public HttpRequestBuilder withRetryPolicy(RetryPolicy retryPolicy){
+        public HttpRequestBuilder withRetryPolicy(RetryPolicy retryPolicy) {
             this.retryPolicy = retryPolicy;
             return this;
         }

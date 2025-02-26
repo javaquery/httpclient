@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.javaquery.util.Objects;
 import com.javaquery.util.string.Strings;
+import lombok.Getter;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
@@ -29,6 +30,7 @@ public class HttpResponse {
     private int statusCode;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @Getter
     private Map<String, String> headers;
 
     @JsonIgnore
@@ -60,15 +62,6 @@ public class HttpResponse {
      */
     public void updateHttpResponse(HttpEntity httpEntity) {
         this.apacheHttpResponse.setEntity(httpEntity);
-    }
-
-    /**
-     * Gets headers.
-     *
-     * @return the headers
-     */
-    public Map<String, String> getHeaders() {
-        return headers;
     }
 
     /**
